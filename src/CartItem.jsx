@@ -5,31 +5,62 @@ import './CartItem.css';
 
 const CartItem = ({ onContinueShopping }) => {
   const cart = useSelector(state => state.cart.items);
+  console.log("Cart Items:",cart);
   const dispatch = useDispatch();
 
   // Calculate total amount for all products in the cart
   const calculateTotalAmount = () => {
- 
+    let totalAmount = 0;
+    cart.forEach(item => {
+        let cost = parseCost(item.cost);
+        totalAmount += item.quantity * cost;
+    });
+    console.log("Total Amount:",totalAmount);
+    return totalAmount;
   };
 
   const handleContinueShopping = (e) => {
-   
+    console.log("Inside handleContinueShopping");
+    onContinueShopping(e);
   };
 
 
 
   const handleIncrement = (item) => {
+    console.log("Inside handleIncrement");
+    dispatch(updateQuantity({name:item.name, quantity:item.quantity+1}));
   };
 
   const handleDecrement = (item) => {
-   
+    console.log("Inside handleDecrement");
+   if(item && item.quantity > 0){
+    dispatch(updateQuantity({name:item.name, quantity:item.quantity-1}));
+   }
   };
 
   const handleRemove = (item) => {
+    console.log("Inside handleRemove");
+        dispatch(removeItem(item.name));
   };
 
   // Calculate total cost based on quantity for an item
+  const parseCost = (costString) => {
+    if (!costString) return 0; // handle null/undefined
+    // Remove all non-digit characters except dot (.)
+    const numericString = costString.replace(/[^0-9.]/g, "");
+    return parseFloat(numericString) || 0;
+  };
+  
   const calculateTotalCost = (item) => {
+    console.log("Inside totalCost");
+    let totalCost = 0;
+    console.log(item.cost);
+    let cost = parseCost(item.cost);
+    
+    console.log("Cost:",cost);
+    totalCost = item.quantity * cost;
+    console.log("Inside totalCost end:",totalCost);
+    return totalCost;
   };
 
   return (
